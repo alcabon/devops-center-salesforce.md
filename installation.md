@@ -1,4 +1,4 @@
-# Guide d'installation DevOps Center Salesforce avec GitHub
+# Guide d'installation DevOps Center Salesforce avec GitHub (Claude-4)
 
 ## Table des matières
 1. [Prérequis](#prérequis)

@@ -59,15 +59,45 @@ Permissions:
 
 ### 3. Configuration des Connected Apps
 
+#### Création de la Connected App pour DevOps Center
 ```javascript
-// Configuration OAuth pour GitHub
+// Configuration OAuth pour GitHub + App Launcher
 Name: DevOps Center GitHub Integration
 Contact Email: admin@yourcompany.com
 Callback URL: https://yourinstance.salesforce.com/services/authcallback/DevOpsCenter
+Start URL: /sf_devops/DevOpsCenter.app
 Scopes:
 - Access and manage your data (api)
 - Perform requests on your behalf at any time (refresh_token, offline_access)
 ```
+
+#### ⚠️ Étapes critiques souvent manquées :
+
+**Étape 1 : Créer la Connected App**
+1. **Setup** → **App Manager** → **New Connected App**
+2. Remplir les informations de base
+3. **⚠️ IMPORTANT** : Ajouter la Start URL : `/sf_devops/DevOpsCenter.app`
+4. Configurer OAuth comme ci-dessus
+5. Sauvegarder
+
+**Étape 2 : Gérer les profils (ÉTAPE CRITIQUE)**
+1. **Setup** → **App Manager** 
+2. Trouver votre Connected App DevOps Center
+3. Cliquer sur **Manage** (dropdown à droite)
+4. Cliquer sur **Manage Profiles**
+5. **⚠️ SÉLECTIONNER LES PROFILS** qui doivent accéder à DevOps Center
+6. Sauvegarder
+
+**Étape 3 : Configurer les Permission Sets**
+1. Dans la même page **Manage Connected Apps**
+2. Cliquer sur **Manage Permission Sets**
+3. **⚠️ SÉLECTIONNER** `sf_devops_NamedCredentials`
+4. Sauvegarder
+
+**Étape 4 : Vérification d'accès**
+- Rafraîchir le navigateur (F5)
+- Vérifier l'App Launcher
+- Si toujours absent, accès direct via URL : `https://votre-domaine.salesforce.com/sf_devops/DevOpsCenter.app`
 
 ## Connexion GitHub
 
@@ -130,11 +160,52 @@ node_modules/
 
 ### 4. Connexion GitHub dans DevOps Center
 
+#### Pour les repositories personnels
 1. Ouvrir **DevOps Center** depuis l'App Launcher
 2. Cliquer sur **Connect to GitHub**
 3. Sélectionner **GitHub.com** ou **GitHub Enterprise**
 4. Autoriser l'accès à votre compte GitHub
 5. Sélectionner le repository à connecter
+
+#### Pour les repositories d'organisation (cas complexe)
+```bash
+# Problème courant : "Resource protected by organization SAML enforcement"
+# Solution en 6 étapes
+```
+
+1. **Demander l'accès dans GitHub** :
+   - Aller dans l'organisation GitHub
+   - Cliquer sur "Request access" si nécessaire
+   - Attendre l'approbation du propriétaire
+
+2. **Configurer l'accès third-party dans l'organisation** :
+   - Organisation Settings → Third-party access
+   - Trouver "Salesforce DevOps Center" 
+   - Cliquer "Grant" ou "Approve"
+
+3. **Dans Salesforce DevOps Center** :
+   - Profile Icon → Settings
+   - Authentication Settings for External Systems
+   - Supprimer "DevOps Center GitHub" existant
+
+4. **Reconnecter GitHub** :
+   - Retourner dans DevOps Center
+   - Créer nouveau projet
+   - Se reconnecter avec GitHub (nouvelle authentification)
+
+5. **Vérifier les permissions** :
+   - Repo access : Read/Write
+   - Organization access : Read
+   - Token permissions si nécessaire
+
+6. **Alternative - Token d'accès personnel** :
+   ```bash
+   GitHub → Settings → Developer settings → Personal access tokens
+   Permissions requises :
+   - repo (full control)
+   - admin:org (read only)
+   - workflow (si GitHub Actions utilisé)
+   ```
 
 ## Configuration du pipeline
 
@@ -332,31 +403,121 @@ public class AccountControllerTest {
 
 ### Erreurs courantes
 
-#### 1. Échec de connexion GitHub
+#### 🚨 1. DevOps Center absent de l'App Launcher
+```bash
+Symptôme: "DevOps Center n'apparaît pas dans l'App Launcher après installation"
+Causes multiples et solutions :
+
+Solution A - Profils manquants (PLUS FRÉQUENT):
+1. Setup → App Manager → Trouver votre Connected App DevOps Center
+2. Dropdown "Manage" → Manage Profiles
+3. Sélectionner les profils qui doivent accéder à l'app
+4. Sauvegarder et rafraîchir le navigateur
+
+Solution B - Start URL manquante:
+1. Setup → App Manager → Connected App DevOps Center
+2. Modifier l'app → Basic Information
+3. Ajouter Start URL: /sf_devops/DevOpsCenter.app
+4. Sauvegarder
+
+Solution C - Permission Set manquant:
+1. Setup → App Manager → Connected App DevOps Center
+2. Manage → Manage Permission Sets
+3. Sélectionner "sf_devops_NamedCredentials"
+4. Sauvegarder
+
+Solution D - Accès direct (contournement):
+URL: https://votre-domaine.salesforce.com/sf_devops/DevOpsCenter.app
+
+Solution E - Recréation complète:
+1. Supprimer la Connected App existante
+2. Recréer avec toutes les étapes ci-dessus
+3. Attendre quelques minutes et rafraîchir
+```
+
+#### 2. Problème d'accès aux repositories GitHub d'organisation
+```bash
+Symptôme: "The request was invalid. Resource protected by organization SAML enforcement"
+Cause: Restrictions SAML de l'organisation GitHub
+Solution:
+1. Demander l'accès à un propriétaire de l'organisation GitHub
+2. Dans GitHub → Organisation Settings → Third-party access
+3. Autoriser Salesforce DevOps Center
+4. Dans DevOps Center → Settings → Authentication Settings
+5. Supprimer "DevOps Center GitHub" et se reconnecter
+```
+
+#### 2. Erreur de projet SFDX invalide
+```bash
+Symptôme: "URL does not reference a valid SFDX project. projectUrl"
+Cause: Repository sans structure Salesforce DX
+Solution:
+1. Créer le fichier sfdx-project.json à la racine
+2. Ajouter le dossier force-app/main/default/
+3. Vérifier la structure du projet :
+   Repository/
+   ├── sfdx-project.json
+   ├── force-app/
+   │   └── main/
+   │       └── default/
+   └── .gitignore
+```
+
+#### 3. Problème de connexion avec email différent
+```bash
+Symptôme: Impossible de se connecter au repository GitHub
+Cause: Email GitHub différent de l'email Salesforce
+Solution:
+1. Utiliser le même email pour GitHub et Salesforce OU
+2. Utiliser un token d'accès personnel GitHub :
+   - GitHub → Settings → Developer settings → Personal access tokens
+   - Générer un token avec les permissions : repo, admin:org
+   - Utiliser ce token lors de la connexion DevOps Center
+```
+
+#### 4. Échec de connexion GitHub
 ```bash
 Symptôme: "Unable to connect to GitHub repository"
 Solution:
-1. Vérifier les permissions GitHub
+1. Vérifier les permissions GitHub (repos, admin:org)
 2. Renouveler le token d'authentification
 3. Vérifier la configuration du Connected App
+4. Clearing cache et reconnexion
 ```
 
-#### 2. Échec de déploiement
+#### 5. Échec de déploiement
 ```bash
 Symptôme: "Deployment failed with validation errors"
 Solution:
 1. Vérifier les erreurs de validation dans DevOps Center
 2. Corriger les erreurs dans le code
-3. Recommiter et redéployer
+3. Vérifier les dépendances métadonnées
+4. Recommiter et redéployer
 ```
 
-#### 3. Problèmes de permissions
+#### 6. Problèmes de permissions Salesforce
 ```bash
 Symptôme: "Insufficient privileges"
 Solution:
 1. Vérifier les Permission Sets assignés
 2. Vérifier les permissions sur les métadonnées
-3. Contacter l'administrateur système
+3. Ajouter "DevOps Center Admin" permission
+4. Contacter l'administrateur système
+```
+
+#### 7. Erreurs génériques d'interface
+```bash
+Symptômes: 
+- "Sorry to interrupt. This page has an error"
+- "An internal server error has occurred"
+- "There was an error. Please reload the page"
+
+Solutions:
+1. Rafraîchir la page (F5)
+2. Vider le cache du navigateur
+3. Essayer en navigation privée
+4. Vérifier l'édition Salesforce (Enterprise/Unlimited requis)
+5. Vérifier la configuration des orgs connectées
 ```
 
 ### Commandes utiles de dépannage
@@ -388,8 +549,11 @@ git fetch origin
 ## Checklist de validation
 
 - [ ] DevOps Center activé et configuré
-- [ ] Permissions utilisateurs assignées
+- [ ] Permissions utilisateurs assignées (Permission Sets + Profils)
+- [ ] **Connected App créée avec Start URL et profils assignés**
+- [ ] **DevOps Center visible dans l'App Launcher**
 - [ ] Repository GitHub configuré avec la structure appropriée
+- [ ] Connexion GitHub réussie (y compris repositories d'organisation)
 - [ ] Pipeline créé avec tous les environnements
 - [ ] Règles de déploiement configurées
 - [ ] Premier déploiement réussi

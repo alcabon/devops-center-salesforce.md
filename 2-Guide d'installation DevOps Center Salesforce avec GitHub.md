@@ -285,7 +285,7 @@ Procédure:
 5. Reconnecter GitHub (nouvelles permissions appliquées)
 ```
 
-## 🚀 Plugin CLI DevOps Center (BETA)
+## Plugin CLI DevOps Center (BETA)
 
 ### **🎯 Alternative officielle révolutionnaire**
 

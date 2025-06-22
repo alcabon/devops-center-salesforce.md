@@ -1206,7 +1206,8 @@ jobs:
         run: |
           echo "${{ secrets.INTEGRATION_SANDBOX_SFDX_URL }}" > auth.txt
           sfdx auth:sfdxurl:store -f auth.txt -a integration
-      
+```
+     
 #### **Phase 1 : GitHub Actions maîtrise l'intégration (DELTA)**
 ```yaml
 # .github/workflows/integration-deployment.yml

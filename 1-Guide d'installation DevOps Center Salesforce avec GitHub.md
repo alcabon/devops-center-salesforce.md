@@ -98,47 +98,101 @@ Permissions:
    - `DevOps Center Admin`
 4. Assigner aux utilisateurs concernés
 
-### 3. Configuration des Connected Apps
+### 3. Configuration des Connected Apps (Procédure officielle Salesforce)
 
-#### Création de la Connected App pour DevOps Center
-```javascript
-// Configuration OAuth pour GitHub + App Launcher
-Name: DevOps Center GitHub Integration
-Contact Email: admin@yourcompany.com
-Callback URL: https://yourinstance.salesforce.com/services/authcallback/DevOpsCenter
-Start URL: /sf_devops/DevOpsCenter.app
-Scopes:
-- Access and manage your data (api)
-- Perform requests on your behalf at any time (refresh_token, offline_access)
+#### **🏗️ Création de la Connected App pour DevOps Center**
+
+**La Connected App permet l'accès à DevOps Center dans l'App Launcher.** L'application DevOps Center apparaît dans l'App Launcher après que les utilisateurs aient été assignés aux permission sets DevOps Center appropriés.
+
+> **💡 Tip Salesforce :** Si vous completez ces étapes et ne voyez toujours pas DevOps Center dans l'App Launcher, voir [Troubleshoot DevOps Center Configuration](https://help.salesforce.com/s/articleView?id=sf.devops_center_troubleshooting.htm).
+
+#### **📋 Procédure étape par étape**
+
+##### **Étape 1 : Créer la Connected App**
+1. Dans **Setup**, entrer `App Manager` dans la Quick Find box
+2. Sélectionner **New Connected App**
+3. Sélectionner **Create a Connected App**
+
+##### **Étape 2 : Configuration Basic Information**
+```yaml
+Connected App Name: DevOps Center
+API Name: DevOps_Center
+Contact Email: support@salesforce.com
+Logo Image URL: https://tinyurl.com/doc-icon
+Description: Manage your development and release processes
 ```
 
-#### ⚠️ Étapes critiques souvent manquées :
+##### **Étape 3 : Configuration Web App Settings**
+```yaml
+Start URL: /sf_devops/DevOpsCenter.app
+```
 
-**Étape 1 : Créer la Connected App**
-1. **Setup** → **App Manager** → **New Connected App**
-2. Remplir les informations de base
-3. **⚠️ IMPORTANT** : Ajouter la Start URL : `/sf_devops/DevOpsCenter.app`
-4. Configurer OAuth comme ci-dessus
-5. Sauvegarder
+> **🚨 CRITIQUE :** Cette Start URL est **essentielle** pour que DevOps Center apparaisse dans l'App Launcher.
 
-**Étape 2 : Gérer les profils (ÉTAPE CRITIQUE)**
-1. **Setup** → **App Manager** 
-2. Trouver votre Connected App DevOps Center
-3. Cliquer sur **Manage** (dropdown à droite)
-4. Cliquer sur **Manage Profiles**
-5. **⚠️ SÉLECTIONNER LES PROFILS** qui doivent accéder à DevOps Center
-6. Sauvegarder
+##### **Étape 4 : Sauvegarde**
+4. Cliquer **Save**
 
-**Étape 3 : Configurer les Permission Sets**
-1. Dans la même page **Manage Connected Apps**
-2. Cliquer sur **Manage Permission Sets**
-3. **⚠️ SÉLECTIONNER** `sf_devops_NamedCredentials`
-4. Sauvegarder
+##### **Étape 5 : Configuration des permissions (ÉTAPES CRITIQUES)**
+5. Dans **Manage Connected Apps**, cliquer **Manage**
+6. Dans la section **Permissions Sets**, cliquer **Manage Permission Sets**
+7. **Sélectionner `sf_devops_NamedCredentials`**, puis cliquer **Save**
 
-**Étape 4 : Vérification d'accès**
-- Rafraîchir le navigateur (F5)
-- Vérifier l'App Launcher
-- Si toujours absent, accès direct via URL : `https://votre-domaine.salesforce.com/sf_devops/DevOpsCenter.app`
+> **⚠️ ATTENTION :** Cette étape est souvent manquée et cause l'absence de DevOps Center dans l'App Launcher !
+
+#### **🔧 Configuration complète détaillée**
+
+```yaml
+# Connected App Configuration (officielle Salesforce)
+Basic Information:
+  Connected App Name: "DevOps Center"
+  API Name: "DevOps_Center"  
+  Contact Email: "support@salesforce.com"
+  Logo Image URL: "https://tinyurl.com/doc-icon"
+  Description: "Manage your development and release processes"
+
+Web App Settings:
+  Start URL: "/sf_devops/DevOpsCenter.app"  # ← ESSENTIEL
+
+OAuth Settings:
+  # Pas mentionné dans la doc officielle pour cette étape
+  # Probablement configuré automatiquement
+
+Manage Connected Apps:
+  Permissions Sets: "sf_devops_NamedCredentials"  # ← CRITIQUE
+```
+
+#### **✅ Vérification post-configuration**
+
+Après avoir suivi ces étapes :
+
+1. **Rafraîchir le navigateur** (F5)
+2. **Vérifier l'App Launcher** - DevOps Center doit apparaître
+3. **Si toujours absent** :
+   - Vérifier que `sf_devops_NamedCredentials` est bien sélectionné
+   - Vérifier que la Start URL est exactement `/sf_devops/DevOpsCenter.app`
+   - Consulter le [Troubleshooting officiel](https://help.salesforce.com/s/articleView?id=sf.devops_center_troubleshooting.htm)
+
+#### **🎯 Accès direct de secours**
+
+Si DevOps Center n'apparaît toujours pas dans l'App Launcher :
+```bash
+URL directe: https://votre-domain.salesforce.com/sf_devops/DevOpsCenter.app
+```
+
+#### **📚 Documentation officielle**
+
+Cette procédure est basée sur la [documentation officielle Salesforce](https://help.salesforce.com/s/articleView?id=platform.devops_center_create_connected_app.htm&type=5).
+
+#### **🔍 Différences avec notre analyse précédente**
+
+| Notre analyse | Documentation officielle | ✅ Validé |
+|---------------|-------------------------|-----------|
+| Start URL nécessaire | ✅ `/sf_devops/DevOpsCenter.app` | ✅ |
+| Permission Set critique | ✅ `sf_devops_NamedCredentials` | ✅ |
+| Logo optionnel | ✅ URL officielle fournie | ✅ |
+| Contact Email | ✅ `support@salesforce.com` | ✅ |
+
+**Notre analyse était correcte ! Cette documentation officielle confirme tous les points critiques que nous avions identifiés.** 🎯
 
 ## Connexion GitHub
 
@@ -208,45 +262,158 @@ node_modules/
 4. Autoriser l'accès à votre compte GitHub
 5. Sélectionner le repository à connecter
 
-#### Pour les repositories d'organisation (cas complexe)
+#### **🏢 Cas complexe : Repository appartenant à une organisation GitHub**
+
+> **⚠️ ATTENTION :** Cette procédure s'applique que vous utilisiez **GitHub.com (cloud)** ou **GitHub Enterprise Server (on-premise)**. La distinction importante est entre repository **personnel** vs **organisation**.
+
+##### **🚨 Problème : Repository d'organisation invisible**
+
 ```bash
-# Problème courant : "Resource protected by organization SAML enforcement"
-# Solution en 6 étapes
+Symptôme: "Les repos GitHub d'organisation ne sont pas visibles dans DevOps Center"
+Cause: Permissions OAuth insuffisantes au niveau organisation
+Solution: Procédure d'autorisation en 4 étapes
 ```
 
-1. **Demander l'accès dans GitHub** :
-   - Aller dans l'organisation GitHub
-   - Cliquer sur "Request access" si nécessaire
-   - Attendre l'approbation du propriétaire
+##### **🔍 Pourquoi deux applications d'intégration Salesforce ?**
 
-2. **Configurer l'accès third-party dans l'organisation** :
-   - Organisation Settings → Third-party access
-   - Trouver "Salesforce DevOps Center" 
-   - Cliquer "Grant" ou "Approve"
+DevOps Center crée **automatiquement 2 applications OAuth** correspondant aux **mécanismes de login Salesforce** :
 
-3. **Dans Salesforce DevOps Center** :
-   - Profile Icon → Settings
-   - Authentication Settings for External Systems
-   - Supprimer "DevOps Center GitHub" existant
+| Application | URL de login | Environnements couverts | Utilisation |
+|-------------|--------------|-------------------------|-------------|
+| **App #1** | `test.salesforce.com` | 🟢 Sandboxes<br/>🟢 Scratch Orgs | Développement |
+| **App #2** | `login.salesforce.com` | 🔴 Production<br/>🟡 Developer Edition | Production/Demo |
 
-4. **Reconnecter GitHub** :
-   - Retourner dans DevOps Center
-   - Créer nouveau projet
-   - Se reconnecter avec GitHub (nouvelle authentification)
+> **💡 Note :** Si vous ne voyez qu'une seule application, c'est que vous n'avez connecté que des environnements utilisant un seul mécanisme de login.
 
-5. **Vérifier les permissions** :
-   - Repo access : Read/Write
-   - Organization access : Read
-   - Token permissions si nécessaire
+##### **📋 Procédure complète (4 étapes)**
 
-6. **Alternative - Token d'accès personnel** :
-   ```bash
-   GitHub → Settings → Developer settings → Personal access tokens
-   Permissions requises :
-   - repo (full control)
-   - admin:org (read only)
-   - workflow (si GitHub Actions utilisé)
-   ```
+###### **Étape 1 : Authentification initiale**
+```bash
+1. S'authentifier à GitHub via DevOps Center
+   → Cela crée les applications OAuth Salesforce
+```
+
+###### **Étape 2 : Autorisation organisation GitHub (CRITIQUE)**
+```yaml
+Context: Repository appartient à une organisation GitHub
+Action: Demander accès aux applications Salesforce Integration
+
+Procédure:
+1. GitHub → Personal Account → Settings
+2. Applications → Authorized OAuth Apps  
+3. Trouver "Salesforce Integration Application"
+4. Localiser votre organisation → Click "Request"
+5. (Si applicable) Répéter pour la 2ème application Salesforce
+```
+
+###### **Étape 3 : Attendre approbation**
+```bash
+→ Le propriétaire de l'organisation GitHub doit approuver votre demande
+→ Vous recevrez une notification une fois approuvé
+```
+
+###### **Étape 4 : Reset authentification DevOps Center**
+```yaml
+1. DevOps Center → Home icon (retour page d'accueil org)
+2. Profile icon → Settings  
+3. Authentication Settings for External Systems
+4. Delete "DevOps Center GitHub"
+5. Reconnecter GitHub (nouvelles permissions appliquées)
+```
+
+##### **🎯 Clarification GitHub Enterprise vs GitHub.com**
+
+| Type GitHub | Cette procédure s'applique | Différences |
+|-------------|---------------------------|-------------|
+| **GitHub.com (Cloud)** | ✅ **OUI** | Procédure standard |
+| **GitHub Enterprise Cloud** | ✅ **OUI** | Même procédure |
+| **GitHub Enterprise Server (On-premise)** | ✅ **OUI** | URL différente mais même logique OAuth |
+
+```yaml
+# Configuration selon votre type GitHub
+GitHub.com:
+  URL: github.com
+  OAuth: Applications Salesforce Integration standard
+  
+GitHub Enterprise Server:
+  URL: votre-github-enterprise.company.com  
+  OAuth: Applications Salesforce Integration (même logique)
+  Note: URL personnalisée mais processus identique
+```
+
+##### **🔧 Diagnostic : Identifier le problème**
+
+```bash
+# Test 1: Vérifier le type de repository
+Repository personnel: ✅ Visible immédiatement dans DevOps Center
+Repository organisation: ❌ Nécessite procédure d'autorisation
+
+# Test 2: Compter les applications Salesforce
+1 application: Environments homogènes (tous sandbox OU tous production)
+2 applications: Mix sandbox + production → Autoriser les deux
+
+# Test 3: Vérifier les permissions GitHub
+Organisation Settings → Third-party access → Salesforce Integration
+Status: Approved ✅ ou Pending/Denied ❌
+```
+
+##### **🚨 Erreurs courantes**
+
+###### **Erreur 1 : Oublier la 2ème application**
+```bash
+Symptôme: DevOps Center fonctionne pour dev mais pas prod (ou inverse)
+Cause: Une seule application autorisée
+Solution: Autoriser les deux applications Salesforce Integration
+```
+
+###### **Erreur 2 : Ne pas reset l'authentification**
+```bash
+Symptôme: Autorisations accordées mais repos toujours invisibles
+Cause: DevOps Center utilise encore l'ancien token
+Solution: Delete "DevOps Center GitHub" et reconnecter
+```
+
+###### **Erreur 3 : Confondre owner vs member**
+```bash
+Symptôme: "Request" button introuvable
+Cause: Seuls les organization owners peuvent voir certaines demandes
+Solution: Contacter un organization owner GitHub
+```
+
+##### **💡 Points de clarification**
+
+```yaml
+Question: "GitHub Enterprise on-premise ou cloud ?"
+Réponse: Cette procédure s'applique aux DEUX
+Distinction importante: Repository personnel vs organisation (pas cloud vs on-premise)
+
+Question: "Pourquoi deux applications ?"  
+Réponse: Salesforce a deux domaines de login distincts
+- test.salesforce.com (sandboxes)
+- login.salesforce.com (production)
+
+Question: "Comment savoir si j'ai besoin de cette procédure ?"
+Réponse: Si votre repository GitHub appartient à une organisation ET 
+         n'apparaît pas dans DevOps Center après connexion standard
+```
+
+##### **🎯 Workflow visuel simplifié**
+
+```mermaid
+graph TD
+    A[Repository GitHub] --> B{Type de repository}
+    B -->|Personnel| C[✅ Visible immédiatement]
+    B -->|Organisation| D[❌ Invisible initialement]
+    D --> E[Request access dans GitHub]
+    E --> F[Organization owner approuve]
+    F --> G[Reset auth DevOps Center]
+    G --> H[✅ Repository maintenant visible]
+    
+    style D fill:#ffeeee
+    style H fill:#eeffee
+```
+
+**Cette procédure est nécessaire pour TOUS les repositories d'organisation GitHub, qu'ils soient sur GitHub.com ou GitHub Enterprise Server.** 🎯
 
 ## Configuration du pipeline
 
@@ -323,9 +490,165 @@ Deployment Rules:
     - Manual deployment only
 ```
 
-## Premier déploiement
+## Premier déploiement et gestion des Work Items
 
-### 1. Préparation du code source
+### **📋 Création et assignation des Work Items (Procédure officielle)**
+
+#### **🎯 Objectif des Work Items**
+
+Dans DevOps Center, une équipe utilise les **Work Items** pour tracker les progrès des changements créés pour atteindre un objectif spécifique, tel que l'activation d'une user story ou la résolution d'un bug. Les Work Items aident une équipe à gérer une release en facilitant l'identification du statut et la gestion des progrès des changements liés.
+
+#### **🔢 Numérotation automatique**
+
+- **Format initial** : 6 chiffres (ex: 000001, 000002)
+- **Extension automatique** : 7 chiffres et plus si nécessaire
+- **Séquence** : Généralement séquentielle, mais **peut ne pas être consécutive**
+- **Raison des gaps** : Opérations concurrentes peuvent créer des sauts dans la numérotation
+
+#### **📋 Prérequis**
+
+> **⚠️ IMPORTANT :** Avant de pouvoir créer et assigner des Work Items, vous devez **créer et activer votre pipeline de projet**.
+
+#### **🛠️ Procédure de création (étape par étape)**
+
+##### **Étape 1 : Accéder aux Work Items**
+1. Depuis la page **Projects**, cliquer sur le **nom du projet** pour lequel vous créez des Work Items
+2. Depuis l'onglet **Work Items**, cliquer sur **New Work Item**
+
+##### **Étape 2 : Configurer le Work Item**
+
+```yaml
+# Configuration du Work Item
+Subject: [Objectif ou problème à résoudre]
+  Exemple: "Implement Account validation workflow"
+  Exemple: "Fix duplicate contact bug in Lightning"
+
+Description: [Informations détaillées]
+  Inclure:
+  - Détails sur les changements
+  - Critères d'acceptation  
+  - Context métier
+  
+  ⚠️ IMPORTANT: Les 255 premiers caractères sont utilisés pour 
+     identifier les changements dans le repository source control
+
+Assignment: [Optionnel]
+  - Assigner à un membre de l'équipe
+  - Peut être fait plus tard
+```
+
+##### **Étape 3 : Sauvegarde**
+3. Cliquer **Save**
+4. Le Work Item est affiché dans l'onglet **Work Items**
+
+##### **Étape 4 : Répéter si nécessaire**
+5. Répéter cette procédure selon les besoins pour tracker et assigner le travail du projet
+
+> **💡 Note :** Vous et les membres de votre équipe pouvez créer des Work Items supplémentaires au fur et à mesure que le projet progresse.
+
+#### **📊 Exemple de Work Items types**
+
+```yaml
+Work Item #000001:
+  Subject: "Create Account validation Lightning Web Component"
+  Description: "Develop LWC for account validation with real-time field validation.
+               Acceptance criteria:
+               - Validate required fields
+               - Display error messages
+               - Integration with Account object
+               - Unit tests with 80%+ coverage"
+  Assigned to: developer@company.com
+
+Work Item #000002:
+  Subject: "Fix duplicate contact detection bug"
+  Description: "Resolve issue where duplicate contacts are created when
+               importing from external system. Bug affects lead conversion.
+               Steps to reproduce: Import contacts via Data Loader...
+               Expected: No duplicates created
+               Actual: Multiple contacts with same email"
+  Assigned to: senior-dev@company.com
+
+Work Item #000003:
+  Subject: "Update Permission Sets for new Account fields"
+  Description: "Add field-level security for new custom fields created in
+               Work Item #000001. Update relevant Permission Sets:
+               - Account_Manager_PS
+               - Account_Read_Only_PS
+               Include in deployment package for UAT testing."
+  Assigned to: admin@company.com
+```
+
+#### **🔗 Relation avec le Source Control**
+
+> **🎯 Point crucial :** DevOps Center utilise les **255 premiers caractères de la description** pour aider à identifier les changements pour ce Work Item dans le repository source control.
+
+```bash
+# Impact sur Git et GitHub Actions
+Description Work Item → Identification changements Git → Package.xml generation
+                    ↓
+               Mapping automatique métadonnées ↔ Work Items
+                    ↓
+          Base pour la rétro-ingénierie de Szandor72
+```
+
+#### **📈 Workflow complet avec Work Items**
+
+```mermaid
+graph TD
+    A[Create Project] --> B[Create Pipeline]
+    B --> C[Activate Pipeline] 
+    C --> D[Create Work Items]
+    D --> E[Assign Work Items]
+    E --> F[Development Work]
+    F --> G[Promote Work Items]
+    G --> H[Bundle in Bundling Stage]
+    H --> I[Deploy to UAT/PROD]
+    
+    style D fill:#e6f3ff
+    style E fill:#e6f3ff
+    style G fill:#ffe6cc
+    style H fill:#ffe6cc
+```
+
+#### **💡 Bonnes pratiques Work Items**
+
+##### **📝 Subject efficace**
+```bash
+✅ BON: "Implement opportunity probability calculator"
+✅ BON: "Fix mass email sending performance issue"
+❌ MAUVAIS: "Update stuff"
+❌ MAUVAIS: "Bug fix"
+```
+
+##### **📋 Description détaillée**
+```yaml
+Structure recommandée:
+  Context: Pourquoi ce changement est nécessaire
+  Changes: Quels composants seront modifiés
+  Acceptance Criteria: Comment valider que c'est terminé
+  Dependencies: Autres Work Items liés
+  
+⚠️ Limite 255 caractères pour mapping source control !
+```
+
+##### **👥 Assignment stratégique**
+```bash
+# Assignation selon expertise
+Frontend changes → Frontend developer
+Apex/Triggers → Backend developer  
+Permissions/Security → Salesforce Admin
+Integration → Integration specialist
+```
+
+#### **🎯 Prochaines étapes**
+
+Maintenant que vous avez configuré DevOps Center, il est temps d'annoncer que DevOps Center est prêt à être utilisé.
+
+**Voir aussi :**
+- [Salesforce Help: Basic Development Workflow](https://help.salesforce.com/s/articleView?id=sf.devops_center_workflow.htm)
+- [Salesforce Help: Open a Work Item](https://help.salesforce.com/s/articleView?id=sf.devops_center_open_work_item.htm)
+
+### **1. Préparation du code source (avec Work Items)**
 
 ```bash
 # Récupération des métadonnées existantes

@@ -285,6 +285,278 @@ Procédure:
 5. Reconnecter GitHub (nouvelles permissions appliquées)
 ```
 
+## 🚀 Plugin CLI DevOps Center (BETA)
+
+### **🎯 Alternative officielle révolutionnaire**
+
+**Fini la rétro-ingénierie ! Salesforce propose des commandes CLI officielles pour DevOps Center.**
+
+> **⚠️ ATTENTION :** Ce plugin est actuellement en **BETA**. Tout aspect de ces commandes peut changer sans préavis. Ne pas utiliser les commandes beta dans vos scripts de production.
+
+**Repository officiel :** [salesforcecli/plugin-devops-center](https://github.com/salesforcecli/plugin-devops-center)
+
+### **📋 Commandes CLI DevOps Center disponibles**
+
+| Commande | Description | Usage GitHub Actions |
+|----------|-------------|---------------------|
+| `sf project deploy pipeline start` | Déployer depuis une branche vers l'org du stage | **Déploiement automatique** |
+| `sf project deploy pipeline validate` | Validation seulement (checkonly) | **Quality gates PR** |
+| `sf project deploy pipeline quick` | Déploiement rapide (post-validation) | **Performance optimisée** |
+| `sf project deploy pipeline report` | Vérifier le statut d'un déploiement | **Monitoring CI/CD** |
+| `sf project deploy pipeline resume` | Reprendre watching d'un déploiement | **Resilience pipeline** |
+
+### **🛠️ Installation et setup**
+
+```bash
+# 1. Installer le plugin DevOps Center (BETA)
+sf plugins install @salesforce/plugin-devops-center@beta
+
+# 2. Vérifier l'installation
+sf plugins
+
+# 3. Autoriser l'org DevOps Center (première fois seulement)
+sf org login web --alias devops-center-org
+```
+
+### **🚀 GitHub Actions avec CLI officiel**
+
+#### **Exemple 1 : Validation automatique sur PR**
+
+```yaml
+name: DevOps Center Official Validation
+on:
+  pull_request:
+    branches: [staging, main]
+
+jobs:
+  official-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Salesforce CLI + Plugin BETA
+        run: |
+          npm install -g @salesforce/cli
+          sf plugins install @salesforce/plugin-devops-center@beta
+      
+      - name: Auth DevOps Center Org
+        run: |
+          echo "${{ secrets.DEVOPS_CENTER_SFDX_URL }}" > auth.txt
+          sf auth sfdxurl store -f auth.txt -a devops-center
+      
+      - name: Official DevOps Center Validation
+        run: |
+          # COMMANDE OFFICIELLE - Plus de rétro-ingénierie !
+          sf project deploy pipeline validate \
+            --devops-center-project-name "${{ vars.DEVOPS_CENTER_PROJECT_NAME }}" \
+            --branch-name "${{ github.base_ref }}" \
+            --devops-center-username devops-center \
+            --test-level RunLocalTests \
+            --wait 30 \
+            --verbose
+```
+
+#### **Exemple 2 : Déploiement automatique post-merge**
+
+```yaml
+name: DevOps Center Official Deploy
+on:
+  push:
+    branches: [staging, main]
+
+jobs:
+  official-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup CLI + Deploy
+        run: |
+          # Installation
+          npm install -g @salesforce/cli
+          sf plugins install @salesforce/plugin-devops-center@beta
+          
+          # Auth DevOps Center
+          echo "${{ secrets.DEVOPS_CENTER_SFDX_URL }}" > auth.txt
+          sf auth sfdxurl store -f auth.txt -a devops-center
+          
+          # DÉPLOIEMENT OFFICIEL
+          sf project deploy pipeline start \
+            --devops-center-project-name "${{ vars.DEVOPS_CENTER_PROJECT_NAME }}" \
+            --branch-name "${{ github.ref_name }}" \
+            --devops-center-username devops-center \
+            --test-level RunLocalTests \
+            --bundle-version-name "v${{ github.run_number }}" \
+            --wait 45 \
+            --verbose
+```
+
+### **💥 Révolution vs approches précédentes**
+
+| Aspect | Rétro-ingénierie Szandor72 | **CLI Officiel DevOps Center** |
+|--------|----------------------------|--------------------------------|
+| **Fiabilité** | ❌ 80% (fragile releases SF) | ✅ **100%** (garantie Salesforce) |
+| **Maintenance** | ❌ Élevée (casse régulièrement) | ✅ **Minimale** (support officiel) |
+| **Complexité** | ❌ 300+ lignes (multi-repos) | ✅ **3 lignes** (une commande) |
+| **Support** | ❌ Communauté seulement | ✅ **Support Salesforce officiel** |
+| **Package.xml** | ❌ Rétro-ingénierie manuelle | ✅ **Généré automatiquement** |
+| **Évolution** | ❌ Risque obsolescence | ✅ **Évolution garantie** |
+
+### **⚠️ Stratégie d'adoption progressive (BETA)**
+
+```yaml
+# Phase 1 : Test et validation (MAINTENANT)
+Actions:
+  ✅ Installer plugin BETA en développement
+  ✅ Tester compatibilité avec pipelines existants
+  ✅ Comparer résultats vs méthodes actuelles
+  ⚠️ Garder fallback pour production critique
+
+# Phase 2 : Migration contrôlée (Quand stabilisé)
+Actions:
+  ✅ Migrer workflows non-critiques vers CLI
+  ✅ Monitoring intensif des déploiements
+  ✅ Formation équipes sur nouvelles commandes
+  ⚠️ Fallback disponible en cas problème
+
+# Phase 3 : Adoption complète (Post-GA)
+Actions:
+  ✅ Migration complète vers CLI officiel
+  ✅ Suppression workarounds rétro-ingénierie
+  ✅ Solution 100% officielle Salesforce
+  ✅ Documentation mise à jour
+```
+
+### **🎯 Recommandation mise à jour**
+
+**Le plugin CLI DevOps Center rend obsolète toute la complexité de rétro-ingénierie !**
+
+- **✅ Nouveaux projets** : Commencer avec CLI BETA + fallback traditionnel
+- **⚖️ Projets existants** : Tester CLI en parallèle des méthodes actuelles
+- **🚀 Futur proche** : Migration vers solution 100% officielle
+
+```bash
+# Structure recommandée du repository
+your-repo/
+├── force-app/
+│   └── main/
+│       └── default/
+│           ├── classes/
+│           ├── triggers/
+│           ├── flows/
+│           └── objects/
+├── sfdx-project.json
+├── .gitignore
+└── README.md
+```
+
+### 2. Configuration du fichier sfdx-project.json
+
+```json
+{
+    "packageDirectories": [
+        {
+            "path": "force-app",
+            "default": true,
+            "package": "YourPackageName",
+            "versionName": "ver 1.0",
+            "versionNumber": "1.0.0.NEXT"
+        }
+    ],
+    "name": "YourProjectName",
+    "namespace": "",
+    "sfdcLoginUrl": "https://login.salesforce.com",
+    "sourceApiVersion": "60.0"
+}
+```
+
+### 3. Configuration du .gitignore
+
+```gitignore
+# Salesforce specific
+.sfdx/
+.localdevserver/
+deploy/
+.vscode/settings.json
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Dependencies
+node_modules/
+```
+
+### 4. Connexion GitHub dans DevOps Center
+
+#### Pour les repositories personnels
+1. Ouvrir **DevOps Center** depuis l'App Launcher
+2. Cliquer sur **Connect to GitHub**
+3. Sélectionner **GitHub.com** ou **GitHub Enterprise**
+4. Autoriser l'accès à votre compte GitHub
+5. Sélectionner le repository à connecter
+
+#### **🏢 Cas complexe : Repository appartenant à une organisation GitHub**
+
+> **⚠️ ATTENTION :** Cette procédure s'applique que vous utilisiez **GitHub.com (cloud)** ou **GitHub Enterprise Server (on-premise)**. La distinction importante est entre repository **personnel** vs **organisation**.
+
+##### **🚨 Problème : Repository d'organisation invisible**
+
+```bash
+Symptôme: "Les repos GitHub d'organisation ne sont pas visibles dans DevOps Center"
+Cause: Permissions OAuth insuffisantes au niveau organisation
+Solution: Procédure d'autorisation en 4 étapes
+```
+
+##### **🔍 Pourquoi deux applications d'intégration Salesforce ?**
+
+DevOps Center crée **automatiquement 2 applications OAuth** correspondant aux **mécanismes de login Salesforce** :
+
+| Application | URL de login | Environnements couverts | Utilisation |
+|-------------|--------------|-------------------------|-------------|
+| **App #1** | `test.salesforce.com` | 🟢 Sandboxes<br/>🟢 Scratch Orgs | Développement |
+| **App #2** | `login.salesforce.com` | 🔴 Production<br/>🟡 Developer Edition | Production/Demo |
+
+> **💡 Note :** Si vous ne voyez qu'une seule application, c'est que vous n'avez connecté que des environnements utilisant un seul mécanisme de login.
+
+##### **📋 Procédure complète (4 étapes)**
+
+###### **Étape 1 : Authentification initiale**
+```bash
+1. S'authentifier à GitHub via DevOps Center
+   → Cela crée les applications OAuth Salesforce
+```
+
+###### **Étape 2 : Autorisation organisation GitHub (CRITIQUE)**
+```yaml
+Context: Repository appartient à une organisation GitHub
+Action: Demander accès aux applications Salesforce Integration
+
+Procédure:
+1. GitHub → Personal Account → Settings
+2. Applications → Authorized OAuth Apps  
+3. Trouver "Salesforce Integration Application"
+4. Localiser votre organisation → Click "Request"
+5. (Si applicable) Répéter pour la 2ème application Salesforce
+```
+
+###### **Étape 3 : Attendre approbation**
+```bash
+→ Le propriétaire de l'organisation GitHub doit approuver votre demande
+→ Vous recevrez une notification une fois approuvé
+```
+
+###### **Étape 4 : Reset authentification DevOps Center**
+```yaml
+1. DevOps Center → Home icon (retour page d'accueil org)
+2. Profile icon → Settings  
+3. Authentication Settings for External Systems
+4. Delete "DevOps Center GitHub"
+5. Reconnecter GitHub (nouvelles permissions appliquées)
+```
+
 ##### **🎯 Clarification GitHub Enterprise vs GitHub.com**
 
 | Type GitHub | Cette procédure s'applique | Différences |

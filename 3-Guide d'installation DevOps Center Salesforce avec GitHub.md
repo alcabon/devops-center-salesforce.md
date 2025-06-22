@@ -4,7 +4,7 @@
 1. [Prérequis](#prérequis)
 2. [Configuration initiale](#configuration-initiale)
 3. [Connexion GitHub](#connexion-github)
-4. [🚀 Plugin CLI DevOps Center (BETA)](#plugin-cli-devops-center-beta)
+4. [Plugin CLI DevOps Center (BETA)](#plugin-cli-devops-center-beta)
 5. [Configuration du pipeline](#configuration-du-pipeline)
 6. [Premier déploiement](#premier-déploiement)
 7. [Synchronisation DevOps Center ↔ GitHub Actions](#synchronisation-devops-center-github-actions)
@@ -286,7 +286,7 @@ Procédure:
 5. Reconnecter GitHub (nouvelles permissions appliquées)
 ```
 
-## 🚀 Plugin CLI DevOps Center (BETA)
+## Plugin CLI DevOps Center (BETA)
 
 ### **🎯 Alternative officielle révolutionnaire**
 
